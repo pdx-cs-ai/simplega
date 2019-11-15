@@ -2,12 +2,12 @@
 
 import random
 
-r = 16
+r = 32
 d = 32
 npop = 1000
-mut = 0.5
-ngen = 50
-
+mut = 0.01
+ngen = 500
+trace = True
 
 def rand_f():
     return { i : random.randrange(r)
@@ -33,7 +33,9 @@ def crossover(f1, f2):
 
 
 def mutate(f):
-    f[random.randrange(d)] = random.randrange(r)
+    for i in range(d):
+        if random.random() < mut:
+            f[i] = random.randrange(r)
 
 
 split = npop // 2
@@ -50,10 +52,14 @@ for g in range(ngen):
         left = random.randrange(split)
         right = random.randrange(split)
         pop[i] = crossover(pop[left], pop[right])
-        if random.random() < mut:
+        if mut > 0:
             mutate(pop[i])
-    best = max(*pop, key=score)
-    print("gen", g, "score", score(best))
+    best = score(max(*pop, key=score))
+    if best == d:
+        break
+    if trace:
+        worst = score(min(*pop, key=score))
+        print("gen", g, "best", best, "worst", worst)
 
 best = max(*pop, key=score)
 print("target")
