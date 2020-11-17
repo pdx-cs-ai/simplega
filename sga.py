@@ -11,6 +11,8 @@ d = 32
 npop = 1000
 # Mutation rate.
 mut = 0.01
+# Retention rate.
+retained = 0.5
 # Maximum number of generations to run the simulation.
 # (Will stop early on a perfect score.)
 ngen = 500
@@ -37,8 +39,11 @@ def score(f):
 # Given two functions f1 and f2, return
 # the one that scores higher when matched
 # against the target.
-def tourney(f1, f2):
-    return max(f1, f2, key=score)
+def tourney(i1, f1, i2, f2):
+    if score(f1) > score(f2):
+        return i2
+    else:
+        return i1
 
 # Pick a random "split point" in the genome. Construct a new
 # function by picking genes from f1 up to the splitpoint,
@@ -60,11 +65,6 @@ def mutate(f):
         if random.random() < mut:
             f[i] = random.randrange(r)
 
-
-# We discard half the populaton by tournament
-# and then regenerate the other half.
-split = npop // 2
-
 # Construct an initial random population.
 pop = [rand_f() for _ in range(npop)]
 
@@ -72,26 +72,36 @@ pop = [rand_f() for _ in range(npop)]
 for g in range(ngen):
     # Shuffle the population up.
     random.shuffle(pop)
-    # Split the population for the tournament.
-    left = pop[split:]
-    right = pop[:split]
+
     # Run the tournament.
-    for i in range(split):
-        pop[i] = tourney(left[i], right[i])
+    split = int(npop * retained)
+    surviving = npop
+    while surviving > split:
+        i = random.randrange(surviving)
+        j = random.randrange(surviving)
+        if i == j:
+            continue
+        remove = tourney(i, pop[i], j, pop[j])
+        del pop[remove]
+        surviving -= 1
+        
     # Replace the losers with combinations
     # of random pairs of winners.
     for i in range(split, npop):
         left = random.randrange(split)
         right = random.randrange(split)
-        pop[i] = crossover(pop[left], pop[right])
+        pop.append(crossover(pop[left], pop[right]))
         # This test is strictly an efficiency hack.
         if mut > 0:
-            mutate(pop[i])
+            mutate(pop[-1])
+    assert len(pop) == npop
+
     # Find the best score achieved and stop if it is
     # perfect.
     best = score(max(*pop, key=score))
     if best == d:
         break
+
     # If tracing, show best and worst scores for this
     # generation.
     if trace:
