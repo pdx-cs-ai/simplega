@@ -33,7 +33,7 @@ target = rand_f()
 # target is the number of domain values
 # on which the outputs are equal.
 def score(f):
-    return sum([int(f[i] == target[i])
+    return -sum([abs(f[i] - target[i])
                 for i in range(d)])
     
 # Given two functions f1 and f2, return
@@ -99,7 +99,7 @@ for g in range(ngen):
     # Find the best score achieved and stop if it is
     # perfect.
     best = score(max(*pop, key=score))
-    if best == d:
+    if best == 0:
         break
 
     # If tracing, show best and worst scores for this
