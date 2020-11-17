@@ -68,6 +68,8 @@ def mutate(f):
 # Construct an initial random population.
 pop = [rand_f() for _ in range(npop)]
 
+best_ever = None
+
 # Run the GA loop.
 for g in range(ngen):
     # Shuffle the population up.
@@ -98,15 +100,20 @@ for g in range(ngen):
 
     # Find the best score achieved and stop if it is
     # perfect.
-    best = score(max(*pop, key=score))
-    if best == 0:
-        break
+    best_index = max(range(npop), key=lambda i: score(pop[i]))
+    if best_ever == None or score(pop[best_index]) > score(best_ever):
+        best_ever = pop[best_index]
 
     # If tracing, show best and worst scores for this
     # generation.
     if trace:
         worst = score(min(*pop, key=score))
-        print("gen", g, "best", best, "worst", worst)
+        print(
+            "gen", g,
+            "best", score(pop[best_index]),
+            "best_ever", "none" if best_ever == None else score(best_ever),
+            "worst", worst,
+        )
 
 # Show final results.
 best = max(*pop, key=score)
