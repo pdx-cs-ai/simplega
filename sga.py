@@ -33,7 +33,7 @@ target = rand_f()
 # target is the number of domain values
 # on which the outputs are equal.
 def score(f):
-    return -sum([abs(f[i] - target[i])
+    return -sum([abs(f[i] - target[i]) + random.randrange(7) - 3
                 for i in range(d)])
     
 # Given two functions f1 and f2, return
@@ -68,6 +68,7 @@ def mutate(f):
 # Construct an initial random population.
 pop = [rand_f() for _ in range(npop)]
 
+# Best individual score ever found.
 best_ever = None
 
 # Run the GA loop.
@@ -121,5 +122,7 @@ print("target")
 print(target)
 print("best")
 print(best)
+print("best_ever")
+print(best_ever)
 print("score")
 print(score(best))
