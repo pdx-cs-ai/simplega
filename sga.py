@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import random
+import tabulate
 
 # Range of function: for each input
 # output a value in 0..r-1.
@@ -107,7 +108,7 @@ for g in range(ngen):
 
     # If tracing, show best and worst scores for this
     # generation.
-    if trace:
+    if trace and g % 10 == 0:
         worst = score(min(*pop, key=score))
         print(
             "gen", g,
@@ -118,11 +119,9 @@ for g in range(ngen):
 
 # Show final results.
 best = max(*pop, key=score)
-print("target")
-print(target)
-print("best")
-print(best)
-print("best_ever")
-print(best_ever)
-print("score")
-print(score(best))
+print(tabulate.tabulate(
+    [[target[i], best[i], best_ever[i]] for i in range(d)]
+))
+
+print("best_ever score")
+print(score(best_ever))
