@@ -30,9 +30,8 @@ def rand_f():
 # Pick a random target function.
 target = rand_f()
 
-# Score of a function f in matching the
-# target is the number of domain values
-# on which the outputs are equal.
+# Score of a function f in matching the target is the
+# "accuracy" over the domain: see below.
 def score(f):
     return -sum([abs(f[i] - target[i]) + random.randrange(7) - 3
                 for i in range(d)])
