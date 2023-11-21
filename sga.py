@@ -9,7 +9,7 @@ r = 32
 # Domain of function: input must be in the range 0..d-1.
 d = 32
 # Size of population. Should be even.
-npop = 1000
+npop = 10000
 # Mutation rate.
 mut = 0.01
 # Retention rate.
@@ -32,15 +32,17 @@ target = rand_f()
 
 # Score of a function f in matching the target is the
 # "accuracy" over the domain: see below.
-def score(f):
-    return -sum([abs(f[i] - target[i]) + random.randrange(7) - 3
-                for i in range(d)])
+def score(f, randomize=False):
+    result = -sum(abs(f[i] - target[i]) for i in range(d))
+    if not randomize:
+        return result
+    return  result + sum(random.randrange(7) - 3 for _ in range(d))
     
 # Given two functions f1 and f2, return
 # the one that scores higher when matched
 # against the target.
 def tourney(i1, f1, i2, f2):
-    if score(f1) > score(f2):
+    if score(f1, randomize=True) > score(f2, randomize=True):
         return i2
     else:
         return i1
@@ -119,7 +121,9 @@ for g in range(ngen):
 # Show final results.
 best = max(*pop, key=score)
 print(tabulate.tabulate(
-    [[target[i], best[i], best_ever[i]] for i in range(d)]
+    [[i, target[i], best[i], best_ever[i]]
+     for i in range(d)
+     if target[i] != best[i] or target[i] != best_ever[i]]
 ))
 
 print("best_ever score")
